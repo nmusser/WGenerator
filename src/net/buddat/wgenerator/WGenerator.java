@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,7 +36,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileView;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.wurmonline.mesh.FoliageAge;
 import com.wurmonline.mesh.GrassData.GrowthTreeStage;
@@ -55,13 +56,14 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 	private WurmAPI api;
 	
 	private HeightMap heightMap;
+	private String heightMapFilePath;
 	
 	private TileMap tileMap;
 	
 	private MapPanel pnlMap;
 	
-	private JPanel pnlControls, pnlHeightMapControls, pnlHeightMapOptions, pnlHeightMapOptions2, pnlHeightMapOptions3, 
-			pnlHeightMapOptionsMiddle, pnlHeightMapOptionsMiddleTop, pnlHeightMapOptionsMiddleBottom;
+	private JPanel pnlControls, pnlHeightMapControls, pnlHeightMapOptions, pnlHeightMapOptions2, pnlHeightMapOptionsGenerate, pnlHeightMapOptionsLoadFile, 
+			pnlHeightMapOptionsMiddle, pnlHeightMapOptionsMiddleTop, pnlHeightMapOptionsMiddleBottom, pnlHeightMapControlsContainer;
 	private JPanel pnlErodeControls, pnlErodeOptions, pnlErodeOptions2, pnlErodeButton;
 	private JPanel pnlDirtControls, pnlDirtOptions, pnlDirtOptions2, pnlDirtOptions3, pnlDirtOptionsMiddle, pnlDirtButton;
 	private JPanel pnlBiomeControls, pnlBiomeOptions, pnlBiomeOptions2, pnlBiomeOptions3, pnlBiomeOptionsMiddle, pnlBiomeButton;
@@ -88,7 +90,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 	private JComboBox cmbMapSize, cmbBiomeType;
 	private Border compound, raisedbevel, loweredbevel;
 	
-	private JButton btnGenHeightMap, btnErodeHeightMap, btnDropDirt, btnSeedBiome, btnUndoBiome, btnResetBiomes, btnGenOres;
+	private JButton btnGenHeightMap, btnLoadHeightMap, btnReloadHeightMap, btnErodeHeightMap, btnDropDirt, btnSeedBiome, btnUndoBiome, btnResetBiomes, btnGenOres;
 	private JButton btnResetHeightSeed, btnResetBiomeSeed;
 	private JButton btnSaveActions, btnLoadActions, btnSaveImages, btnSaveMap, btnShowDump, btnShowTopo, btnShowCave, btnShowHeightMap;
 	
@@ -108,12 +110,12 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		
 		pnlControls = new JPanel();
 		pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-		pnlControls.setPreferredSize(new Dimension(400, 768));
+		pnlControls.setPreferredSize(new Dimension(540, 900));
 		pnlControls.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		pnlHeightMapControls = new JPanel();
 		pnlHeightMapControls.setLayout(new BorderLayout());
-		pnlHeightMapControls.setPreferredSize(new Dimension(380, 75));
+		pnlHeightMapControls.setPreferredSize(new Dimension(520, 120));
 		pnlHeightMapControls.setBorder(compound);
 		pnlHeightMapOptions = new JPanel();
 		pnlHeightMapOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -121,16 +123,21 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		pnlHeightMapOptions2.setLayout(new FlowLayout(FlowLayout.CENTER));
 		pnlHeightMapOptionsMiddle = new JPanel();
 		pnlHeightMapOptionsMiddle.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapOptions3 = new JPanel();
-		pnlHeightMapOptions3.setLayout(new FlowLayout(FlowLayout.CENTER));
+		pnlHeightMapOptionsGenerate = new JPanel();
+		pnlHeightMapOptionsGenerate.setLayout(new FlowLayout(FlowLayout.CENTER));
+		pnlHeightMapOptionsLoadFile = new JPanel();
+		pnlHeightMapOptionsLoadFile.setLayout(new FlowLayout(FlowLayout.CENTER));
 		pnlHeightMapOptionsMiddleTop = new JPanel();
 		pnlHeightMapOptionsMiddleTop.setLayout(new FlowLayout(FlowLayout.CENTER));
 		pnlHeightMapOptionsMiddleBottom = new JPanel();
 		pnlHeightMapOptionsMiddleBottom.setLayout(new FlowLayout(FlowLayout.CENTER));
+		pnlHeightMapControlsContainer = new JPanel();
+		pnlHeightMapControlsContainer.setLayout(new FlowLayout(FlowLayout.CENTER));
+		
 		
 		pnlErodeControls = new JPanel();
 		pnlErodeControls.setLayout(new BorderLayout());
-		pnlErodeControls.setPreferredSize(new Dimension(380, 30));
+		pnlErodeControls.setPreferredSize(new Dimension(520, 50));
 		pnlErodeControls.setBorder(compound);
 		pnlErodeOptions = new JPanel();
 		pnlErodeOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -141,7 +148,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		
 		pnlDirtControls = new JPanel();
 		pnlDirtControls.setLayout(new BorderLayout());
-		pnlDirtControls.setPreferredSize(new Dimension(380, 75));
+		pnlDirtControls.setPreferredSize(new Dimension(520, 95));
 		pnlDirtControls.setBorder(compound);
 		pnlDirtOptions = new JPanel();
 		pnlDirtOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -156,7 +163,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		
 		pnlBiomeControls = new JPanel();
 		pnlBiomeControls.setLayout(new BorderLayout());
-		pnlBiomeControls.setPreferredSize(new Dimension(380, 75));
+		pnlBiomeControls.setPreferredSize(new Dimension(520, 95));
 		pnlBiomeControls.setBorder(compound);
 		pnlBiomeOptions = new JPanel();
 		pnlBiomeOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -171,7 +178,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		
 		pnlOreControls = new JPanel();
 		pnlOreControls.setLayout(new BorderLayout());
-		pnlOreControls.setPreferredSize(new Dimension(380, 110));
+		pnlOreControls.setPreferredSize(new Dimension(520, 130));
 		pnlOreControls.setBorder(compound);
 		pnlOreOptions = new JPanel();
 		pnlOreOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -213,7 +220,11 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		btnResetHeightSeed = new JButton("#");
 		btnResetHeightSeed.addActionListener(this);
 		btnGenHeightMap = new JButton("Gen Heightmap");
+		btnLoadHeightMap = new JButton("Load Heightmap");
+		btnReloadHeightMap = new JButton("Reload Heightmap");
 		btnGenHeightMap.addActionListener(this);
+		btnLoadHeightMap.addActionListener(this);
+		btnReloadHeightMap.addActionListener(this);
 		
 		pnlHeightMapOptions.add(lblMapSize);
 		pnlHeightMapOptions.add(cmbMapSize);
@@ -230,15 +241,21 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		pnlHeightMapOptionsMiddleBottom.add(txtBorderWeight);
 		pnlHeightMapOptionsMiddleBottom.add(lblMaxHeight);
 		pnlHeightMapOptionsMiddleBottom.add(txtMaxHeight);
-		pnlHeightMapOptions3.add(chkLand);
-		pnlHeightMapOptions3.add(btnGenHeightMap);
+		pnlHeightMapOptionsGenerate.add(chkLand);
+		pnlHeightMapOptionsGenerate.add(btnGenHeightMap);
+		pnlHeightMapOptionsLoadFile.add(btnLoadHeightMap);
+		pnlHeightMapOptionsLoadFile.add(btnReloadHeightMap);
 		
-		pnlHeightMapOptionsMiddle.add(pnlHeightMapOptionsMiddleTop);
-		pnlHeightMapOptionsMiddle.add(pnlHeightMapOptionsMiddleBottom);
+		//pnlHeightMapOptionsMiddle.add(pnlHeightMapOptionsMiddleTop);
+		//pnlHeightMapOptionsMiddle.add(pnlHeightMapOptionsMiddleBottom);
+		
+		pnlHeightMapControlsContainer.add(pnlHeightMapOptionsMiddleTop, BorderLayout.NORTH);
+		pnlHeightMapControlsContainer.add(pnlHeightMapOptionsMiddleBottom, BorderLayout.CENTER);
+		pnlHeightMapControlsContainer.add(pnlHeightMapOptionsGenerate, BorderLayout.SOUTH);
 		
 		pnlHeightMapControls.add(pnlHeightMapOptions, BorderLayout.NORTH);
-		pnlHeightMapControls.add(pnlHeightMapOptionsMiddle, BorderLayout.CENTER);
-		pnlHeightMapControls.add(pnlHeightMapOptions3,  BorderLayout.SOUTH);
+		pnlHeightMapControls.add(pnlHeightMapControlsContainer,BorderLayout.CENTER);
+		pnlHeightMapControls.add(pnlHeightMapOptionsLoadFile,  BorderLayout.SOUTH);
 		
 		lblErodeIterations = new JLabel("Erosion Iterations:");
 		txtErodeIterations = new JTextField("" + Constants.EROSION_ITERATIONS, 3);
@@ -513,6 +530,22 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		updateMapView(false, 0);
 	}
 	
+	public void newHeightMapFromFile(String newImageFilename, int maxHeight) {
+		int index = newImageFilename.lastIndexOf(File.separator);
+		String fileName = newImageFilename.substring(index + 1);
+		if (fileName.indexOf(".") > 0)
+			fileName = fileName.substring(0, fileName.lastIndexOf("."));
+		txtName.setText(fileName);
+		BufferedImage newImage = null;
+		try{
+			newImage = ImageIO.read(new File(newImageFilename));
+		}catch(IOException e){
+		}
+		heightMap = new HeightMap(newImage, maxHeight);
+		
+		updateMapView(false, 0);
+	}
+	
 	public void updateMapView(boolean apiView, int viewType) {
 		if (!apiView) {
 			Graphics g = pnlMap.getMapImage().getGraphics();
@@ -675,6 +708,58 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+		if (e.getSource() == btnLoadHeightMap) {
+			try {
+				api = null;
+				genHistory = new ArrayList<String>();
+				
+				pnlMap.setMapSize((int) cmbMapSize.getSelectedItem());
+				
+				File heightmapFile = null;
+				
+				JFileChooser fc = new JFileChooser();
+				
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				        "PNG Heightmap Files", "png");
+				fc.setFileFilter(filter);
+				fc.setAcceptAllFileFilterUsed(false);
+				fc.setCurrentDirectory(new File("./maps/"));
+				
+				int returnVal = fc.showDialog(this, "Load Heightmap");
+
+		        if (returnVal == JFileChooser.APPROVE_OPTION) {
+		            heightmapFile = fc.getSelectedFile();
+		        }
+				heightMapFilePath = heightmapFile.getAbsolutePath();
+				newHeightMapFromFile(heightMapFilePath, Integer.parseInt(txtMaxHeight.getText()));
+				
+				/*genHistory.add("HEIGHTMAP:" + txtSeed.getText() + "," + cmbMapSize.getSelectedIndex() + "," + txtRes.getText() + "," +
+						txtIterations.getText() + "," + txtMinEdge.getText() + "," + txtBorderWeight.getText() + "," +
+						txtMaxHeight.getText() + "," + chkLand.isSelected());*/
+			} catch (NumberFormatException nfe) {
+				JOptionPane.showMessageDialog(this, "Error parsing number " + nfe.getMessage().toLowerCase(), "Error Generating HeightMap", JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}
+		
+		if (e.getSource() == btnReloadHeightMap) {
+			try {
+				api = null;
+				genHistory = new ArrayList<String>();
+				
+				pnlMap.setMapSize((int) cmbMapSize.getSelectedItem());
+				
+				newHeightMapFromFile(heightMapFilePath, Integer.parseInt(txtMaxHeight.getText()));
+				
+				/*genHistory.add("HEIGHTMAP:" + txtSeed.getText() + "," + cmbMapSize.getSelectedIndex() + "," + txtRes.getText() + "," +
+						txtIterations.getText() + "," + txtMinEdge.getText() + "," + txtBorderWeight.getText() + "," +
+						txtMaxHeight.getText() + "," + chkLand.isSelected());*/
+			} catch (NumberFormatException nfe) {
+				JOptionPane.showMessageDialog(this, "Error parsing number " + nfe.getMessage().toLowerCase(), "Error Generating HeightMap", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		
 		if (e.getSource() == btnGenHeightMap) {
 			try {
 				api = null;
@@ -950,6 +1035,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		if (e.getSource() == btnResetBiomeSeed) {
 			txtBiomeSeed.setText("" + System.currentTimeMillis());
 		}
+		java.awt.Toolkit.getDefaultToolkit().beep();
 	}
 	
 	public static void main(String[] args) {
