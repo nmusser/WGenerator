@@ -5,6 +5,10 @@ import java.util.logging.Logger;
 
 import net.buddat.wgenerator.util.SimplexNoise;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.lang.Math;
+
 /**
  * @author Budda
  *
@@ -53,6 +57,40 @@ public class HeightMap {
 		this.singleDirt = 1.0 / maxHeight;
 		
 		logger.setLevel(Level.INFO);
+	}
+	
+	public HeightMap(BufferedImage newImage, int maxHeight) {
+		this.noiseSeed = 0;
+		this.mapSize = newImage.getHeight();
+		logger.log(Level.INFO, "mapSize="+this.mapSize);
+		this.resolution = 0;
+		this.iterations = 0;
+		this.minimumEdge = 0;
+		this.maxHeight = maxHeight;
+		this.moreLand = true;
+		this.borderCutoff = 0;
+		this.borderNormalize = 0;
+		this.singleDirt = 1.0 / maxHeight;
+		
+		this.heightArray = new double[newImage.getHeight()][newImage.getWidth()];
+		Raster heightRaster = newImage.getRaster();
+		logger.setLevel(Level.INFO);
+		for (int x = 0; x < mapSize; x++){
+			for (int y = 0; y < mapSize; y++){
+				int[] heightPixelColor = new int[2];
+				heightRaster.getPixel(x, y, heightPixelColor);
+				//double height = (short) ((heightPixelColor[0] - Short.MAX_VALUE));
+				//if(height!=0) height = 1d/height;
+				//double height = heightPixelColor[0];
+				//setHeight(x, y, height, false);
+				double height = (double)(heightPixelColor[0])/65535d;
+				this.heightArray[x][y] = height;
+				if (height > 1) logger.log(Level.INFO, "This pixel is too damn big: " + heightPixelColor[0]);
+				if (height < 0) logger.log(Level.INFO, "This pixel is too damn small:" + heightPixelColor[0]);
+			}
+		}
+		normalizeHeights();
+		logger.log(Level.INFO, "We're done generating this shit");
 	}
 	
 	/**
