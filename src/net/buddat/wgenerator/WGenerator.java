@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -32,6 +33,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -62,6 +64,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 	
 	private MapPanel pnlMap;
 	
+	
 	private JPanel pnlControls, pnlHeightMapControls, pnlHeightMapOptions, pnlHeightMapOptions2, pnlHeightMapOptionsGenerate, pnlHeightMapOptionsLoadFile, 
 			pnlHeightMapOptionsMiddle, pnlHeightMapOptionsMiddleTop, pnlHeightMapOptionsMiddleBottom, pnlHeightMapControlsContainer;
 	private JPanel pnlErodeControls, pnlErodeOptions, pnlErodeOptions2, pnlErodeButton;
@@ -90,7 +93,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 	private JComboBox cmbMapSize, cmbBiomeType;
 	private Border compound, raisedbevel, loweredbevel;
 	
-	private JButton btnGenHeightMap, btnLoadHeightMap, btnReloadHeightMap, btnErodeHeightMap, btnDropDirt, btnSeedBiome, btnUndoBiome, btnResetBiomes, btnGenOres;
+	private JButton btnGenHeightMap, btnLoadHeightMap, btnReloadHeightMap, btnErodeHeightMap, btnDropDirt, btnDropWater, btnSeedBiome, btnUndoBiome, btnResetBiomes, btnGenOres;
 	private JButton btnResetHeightSeed, btnResetBiomeSeed;
 	private JButton btnSaveActions, btnLoadActions, btnSaveImages, btnSaveMap, btnShowDump, btnShowTopo, btnShowCave, btnShowHeightMap;
 	
@@ -107,6 +110,8 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		raisedbevel = BorderFactory.createRaisedBevelBorder();
 		loweredbevel = BorderFactory.createLoweredBevelBorder();
 		compound = BorderFactory.createCompoundBorder(raisedbevel, loweredbevel);
+		
+		JTabbedPane tabControls = new JTabbedPane();
 		
 		pnlControls = new JPanel();
 		pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
@@ -297,6 +302,8 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		btnResetBiomeSeed.addActionListener(this);
 		btnDropDirt = new JButton("Drop Dirt");
 		btnDropDirt.addActionListener(this);
+		btnDropWater = new JButton("Reload Water");
+		btnDropWater.addActionListener(this);
 		
 		pnlDirtOptions.add(lblBiomeSeed);
 		pnlDirtOptions.add(txtBiomeSeed);
@@ -316,6 +323,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		pnlDirtOptionsMiddle.add(pnlDirtOptions3);
 		
 		pnlDirtButton.add(btnDropDirt);
+		pnlDirtButton.add(btnDropWater);
 		
 		pnlDirtControls.add(pnlDirtOptions, BorderLayout.NORTH);
 		pnlDirtControls.add(pnlDirtOptionsMiddle, BorderLayout.CENTER);
@@ -490,16 +498,24 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		pnlSaveControls.add(pnlSaveOptions, BorderLayout.CENTER);
 		pnlSaveControls.setPreferredSize(new Dimension(1000, 35));
 		
-		pnlControls.add(pnlHeightMapControls);
-		pnlControls.add(pnlErodeControls);
-		pnlControls.add(pnlDirtControls);
-		pnlControls.add(pnlBiomeControls);
-		pnlControls.add(pnlOreControls);
+		//pnlControls.add(pnlHeightMapControls);
+		//pnlControls.add(pnlErodeControls);
+		//pnlControls.add(pnlDirtControls);
+		//pnlControls.add(pnlBiomeControls);
+		//pnlControls.add(pnlOreControls);
+		
+		ImageIcon icon = null;
+		tabControls.addTab("Heightmap", icon, pnlHeightMapControls, "Heightmap Controls");
+		tabControls.addTab("Erosion", icon, pnlErodeControls, "Erode Controls");
+		tabControls.addTab("Dirt", icon, pnlDirtControls, "Dirt Controls");
+		tabControls.addTab("Biome", icon, pnlBiomeControls, "Biome Controls");
+		tabControls.addTab("Ore", icon, pnlOreControls, "Ore Controls");
 		
 		pnlMap = new MapPanel(width, height);
 		pnlMap.setBackground(Color.BLACK);
 		
-		this.add(pnlControls, BorderLayout.EAST);
+		//this.add(pnlControls, BorderLayout.EAST);
+		this.add(tabControls, BorderLayout.EAST);
 		this.add(pnlMap, BorderLayout.CENTER);
 		this.add(pnlSaveControls, BorderLayout.SOUTH);
 		
@@ -744,6 +760,10 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		}
 		
 		if (e.getSource() == btnReloadHeightMap) {
+			if (heightMapFilePath == null) {
+				JOptionPane.showMessageDialog(this, "Please load a map first!", "Error Reloading Heightmap", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			try {
 				api = null;
 				genHistory = new ArrayList<String>();
@@ -795,6 +815,21 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 				genHistory.add("ERODE:" + txtErodeIterations.getText() + "," + txtErodeMinSlope.getText() + "," + txtErodeMaxSediment.getText());
 			} catch (NumberFormatException nfe) {
 				JOptionPane.showMessageDialog(this, "Error parsing number " + nfe.getMessage().toLowerCase(), "Error Eroding HeightMap", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		
+		if (e.getSource() == btnDropWater) {
+			if (tileMap == null) {
+				JOptionPane.showMessageDialog(this,"Please drop dirt at least one time first!",  "Error Reloading Water", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			try {
+				tileMap.setWaterHeight(Integer.parseInt(txtWaterHeight.getText()));
+				tileMap.reloadTileTypes();
+				updateMapView(true, 0);
+			} catch (NumberFormatException nfe) {
+				JOptionPane.showMessageDialog(this, "Error parsing number " + nfe.getMessage().toLowerCase(), "Error Dropping Dirt", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		
