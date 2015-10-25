@@ -8,7 +8,8 @@ package net.buddat.wgenerator.util;
 public class Constants {
 	
 	public static final String WINDOW_TITLE = "WGenerator - Map Generator for Wurm Unlimited";
-	public static final int WINDOW_SIZE = 1000;
+	public static final int WINDOW_SIZE_WIDTH = 800;
+	public static final int WINDOW_SIZE_HEIGHT = 600;
 	
 	public static final int MAP_SIZE = 2048;
 	public static final float MAP_HEIGHT = 4096f;
