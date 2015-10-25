@@ -4,9 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
@@ -33,7 +36,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -62,148 +68,91 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 	
 	private TileMap tileMap;
 	
-	private MapPanel pnlMap;
-	
-	
-	private JPanel pnlControls, pnlHeightMapControls, pnlHeightMapOptions, pnlHeightMapOptions2, pnlHeightMapOptionsGenerate, pnlHeightMapOptionsLoadFile, 
-			pnlHeightMapOptionsMiddle, pnlHeightMapOptionsMiddleTop, pnlHeightMapOptionsMiddleBottom, pnlHeightMapControlsContainer;
-	private JPanel pnlErodeControls, pnlErodeOptions, pnlErodeOptions2, pnlErodeButton;
-	private JPanel pnlDirtControls, pnlDirtOptions, pnlDirtOptions2, pnlDirtOptions3, pnlDirtOptionsMiddle, pnlDirtButton;
-	private JPanel pnlBiomeControls, pnlBiomeOptions, pnlBiomeOptions2, pnlBiomeOptions3, pnlBiomeOptionsMiddle, pnlBiomeButton;
-	private JPanel pnlOreControls, pnlOreOptions, pnlOreOptions2, pnlOreOptions3, pnlOreOptions4, pnlOreOptionsMiddle, pnlOreButton;
-	private JPanel pnlSaveControls, pnlSaveOptions;
-	
-	private JLabel lblMapSize, lblSeed, lblRes, lblIterations, lblMinEdge, lblBorderWeight, lblMaxHeight;
-	private JLabel lblErodeIterations, lblErodeMinSlope, lblErodeMaxSediment;
-	private JLabel lblBiomeSeed, lblDirtAmnt, lblDirtSlope, lblDirtDiagSlope, lblMaxDirtHeight, lblWaterHeight;
-	private JLabel lblBiomeSeedCount, lblBiomeSize, lblBiomeMaxSlope, lblBiomeRate, lblBiomeMinHeight, lblBiomeMaxHeight;
-	private JLabel lblRock, lblIron, lblGold, lblSilver, lblZinc, lblCopper, lblLead, lblTin, lblAddy, lblGlimmer, lblMarble, lblSlate;
-	
-	private JTextField txtSeed, txtRes, txtIterations, txtMinEdge, txtBorderWeight, txtMaxHeight;
-	private JTextField txtErodeIterations, txtErodeMinSlope, txtErodeMaxSediment;
-	private JTextField txtBiomeSeed, txtDirtAmnt, txtDirtSlope, txtDirtDiagSlope, txtMaxDirtHeight, txtWaterHeight;
-	private JTextField txtBiomeSeedCount, txtBiomeSize, txtBiomeMaxSlope, txtBiomeRateN, txtBiomeRateS, txtBiomeRateE, txtBiomeRateW, 
-			txtBiomeMinHeight, txtBiomeMaxHeight;
-	private JTextField txtRock, txtIron, txtGold, txtSilver, txtZinc, txtCopper, txtLead, txtTin, txtAddy, txtGlimmer, txtMarble, txtSlate;
-	private JTextField txtName;
-	
-	private JCheckBox chkLand;
-	
 	@SuppressWarnings("rawtypes")
-	private JComboBox cmbMapSize, cmbBiomeType;
-	private Border compound, raisedbevel, loweredbevel;
 	
-	private JButton btnGenHeightMap, btnLoadHeightMap, btnReloadHeightMap, btnErodeHeightMap, btnDropDirt, btnDropWater, btnSeedBiome, btnUndoBiome, btnResetBiomes, btnGenOres;
-	private JButton btnResetHeightSeed, btnResetBiomeSeed;
-	private JButton btnSaveActions, btnLoadActions, btnSaveImages, btnSaveMap, btnShowDump, btnShowTopo, btnShowCave, btnShowHeightMap;
+	//Top Level Containers
+	private JPanel ahiriSwing_PnlMapAndStatus;
+	private JTabbedPane ahiriSwing_TabControls;
+		//Second Level Containers
+		private JPanel ahiriSwing_PnlMapAndControls;
+		private JPanel ahiriSwing_PnlConsoleAndStatus;
+		private JPanel ahiriSwing_PnlHeightMapControls, ahiriSwing_PnlErosionControls, ahiriSwing_PnlDirtControls, ahiriSwing_PnlBiomeControls, ahiriSwing_PnlOreControls;
+			//Third Level Containers
+			private JPanel ahiriSwing_PnlMapControls;
+			private JPanel ahiriSwing_PnlStatus, ahiriSwing_PnlConsole;
+				//Fourth Level Containers
+				private JPanel ahiriSwing_PnlHeightMapOptions, ahiriSwing_PnlHeightMapButtons;
+				private JPanel ahiriSwing_PnlErosionOptions, ahiriSwing_PnlErosionButtons;
+				private JPanel ahiriSwing_PnlDirtOptions, ahiriSwing_PnlDirtButtons;
+				private JPanel ahiriSwing_PnlBiomeOptions, ahiriSwing_PnlBiomeButtons;
+				private JPanel ahiriSwing_PnlOreOptions, ahiriSwing_PnlOreButtons;
+					//Fifth Level Containers
+					private JPanel ahiriSwing_PnlHeightMap_MapSize, ahiriSwing_PnlHeightMap_Seed, ahiriSwing_PnlHeightMap_ResIter, ahiriSwing_PnlHeightMap_EdgeBorder, ahiriSwing_PnlHeightMap_HeightLand;
+					private JPanel ahiriSwing_PnlHeightMap_Gen, ahiriSwing_PnlHeightMap_Load;
+					private JPanel ahiriSwing_PnlErosion_Iter, ahiriSwing_PnlErosion_Slope, ahiriSwing_PnlErosion_Sediment;
+					private JPanel ahiriSwing_PnlErosion_Erode;
+					private JPanel ahiriSwing_PnlDirt_Seed, ahiriSwing_PnlDirt_Amnt, ahiriSwing_PnlDirtSlope, ahiriSwing_PnlDirt_DiagHeight, ahiriSwing_PnlDirt_Water;
+					private JPanel ahiriSwing_PnlDirt_Drop;
+					private JPanel ahiriSwing_PnlBiome_Type, ahiriSwing_PnlBiome_SeedSize, ahiriSwing_PnlBiome_Slope, ahiriSwing_PnlBiome_HeightMin, ahiriSwing_PnlBiome_HeightMax, ahiriSwing_PnlBiome_Rate, ahiriSwing_PnlBiome_RateNS, ahiriSwing_PnlBiome_RateEW;
+					private JPanel ahiriSwing_PnlBiome_Add, ahiriSwing_PnlBiome_ResetUndo;
+					private JPanel ahiriSwing_PnlOre_RockIron, ahiriSwing_PnlOre_GoldSilver, ahiriSwing_PnlOre_ZincCopper, ahiriSwing_PnlOre_LeadTin, ahiriSwing_PnlOre_AddyGlimmer, ahiriSwing_PnlOre_MarbleSlate;
+					private JPanel ahiriSwing_PnlOre_Gen;
+					
+	//Actual Elements
+		//Status Elements
+		private JProgressBar ahiriSwing_ProgressBarStatus;
+		//Console Elements
+		private JTextArea ahiriSwing_Console;
+		private JScrollPane ahiriSwing_ConsoleScrollPane;
+		//Map Elements
+		private MapPanel pnlMap;
+		//Map Controls Elements
+		private JTextField txtName;
+		private JButton btnSaveActions, btnLoadActions, btnSaveImages, btnSaveMap, btnShowDump, btnShowTopo, btnShowCave, btnShowHeightMap;
+		//Tab Elements
+			//HeightMap Elements
+			private JLabel lblMapSize, lblSeed, lblRes, lblIterations, lblMinEdge, lblBorderWeight, lblMaxHeight;
+			private JTextField txtSeed, txtRes, txtIterations, txtMinEdge, txtBorderWeight, txtMaxHeight;
+			private JCheckBox chkLand;
+			private JComboBox cmbMapSize;
+			private JButton btnGenHeightMap, btnLoadHeightMap, btnReloadHeightMap, btnResetHeightSeed;
+			//Erosion Elements
+			private JLabel lblErodeIterations, lblErodeMinSlope, lblErodeMaxSediment;
+			private JTextField txtErodeIterations, txtErodeMinSlope, txtErodeMaxSediment;
+			private JButton btnErodeHeightMap;
+			//Dirt Elements
+			private JLabel lblBiomeSeed, lblDirtAmnt, lblDirtSlope, lblDirtDiagSlope, lblMaxDirtHeight, lblWaterHeight;
+			private JTextField txtBiomeSeed, txtDirtAmnt, txtDirtSlope, txtDirtDiagSlope, txtMaxDirtHeight, txtWaterHeight;
+			private JButton btnSeedBiome, btnDropDirt, btnDropWater;
+			//Biome Elements
+			private JLabel lblBiomeSeedCount, lblBiomeSize, lblBiomeMaxSlope, lblBiomeRate, lblBiomeRateN, lblBiomeRateS, lblBiomeRateE, lblBiomeRateW, lblBiomeMinHeight, lblBiomeMaxHeight;
+			private JTextField txtBiomeSeedCount, txtBiomeSize, txtBiomeMaxSlope, txtBiomeRateN, txtBiomeRateS, txtBiomeRateE, txtBiomeRateW, txtBiomeMinHeight, txtBiomeMaxHeight;
+			private JComboBox cmbBiomeType;
+			private JButton btnUndoBiome, btnResetBiomes, btnResetBiomeSeed;
+			//Ore Elements
+			private JLabel lblRock, lblIron, lblGold, lblSilver, lblZinc, lblCopper, lblLead, lblTin, lblAddy, lblGlimmer, lblMarble, lblSlate;
+			private JTextField txtRock, txtIron, txtGold, txtSilver, txtZinc, txtCopper, txtLead, txtTin, txtAddy, txtGlimmer, txtMarble, txtSlate;
+			private JButton btnGenOres;
 	
 	private ArrayList<String> genHistory;
 	
 	private boolean apiClosed = true;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	
 	public WGenerator(String title, int width, int height) {
+		//Configures Main Window
 		super(title);
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setLayout(new BorderLayout());
-		
-		raisedbevel = BorderFactory.createRaisedBevelBorder();
-		loweredbevel = BorderFactory.createLoweredBevelBorder();
-		compound = BorderFactory.createCompoundBorder(raisedbevel, loweredbevel);
-		
-		JTabbedPane tabControls = new JTabbedPane();
-		
-		pnlControls = new JPanel();
-		pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-		pnlControls.setPreferredSize(new Dimension(540, 900));
-		pnlControls.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
-		pnlHeightMapControls = new JPanel();
-		pnlHeightMapControls.setLayout(new BorderLayout());
-		pnlHeightMapControls.setPreferredSize(new Dimension(520, 120));
-		pnlHeightMapControls.setBorder(compound);
-		pnlHeightMapOptions = new JPanel();
-		pnlHeightMapOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapOptions2 = new JPanel();
-		pnlHeightMapOptions2.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapOptionsMiddle = new JPanel();
-		pnlHeightMapOptionsMiddle.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapOptionsGenerate = new JPanel();
-		pnlHeightMapOptionsGenerate.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapOptionsLoadFile = new JPanel();
-		pnlHeightMapOptionsLoadFile.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapOptionsMiddleTop = new JPanel();
-		pnlHeightMapOptionsMiddleTop.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapOptionsMiddleBottom = new JPanel();
-		pnlHeightMapOptionsMiddleBottom.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlHeightMapControlsContainer = new JPanel();
-		pnlHeightMapControlsContainer.setLayout(new FlowLayout(FlowLayout.CENTER));
-		
-		
-		pnlErodeControls = new JPanel();
-		pnlErodeControls.setLayout(new BorderLayout());
-		pnlErodeControls.setPreferredSize(new Dimension(520, 50));
-		pnlErodeControls.setBorder(compound);
-		pnlErodeOptions = new JPanel();
-		pnlErodeOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlErodeOptions2 = new JPanel();
-		pnlErodeOptions2.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlErodeButton = new JPanel();
-		pnlErodeButton.setLayout(new FlowLayout(FlowLayout.CENTER));
-		
-		pnlDirtControls = new JPanel();
-		pnlDirtControls.setLayout(new BorderLayout());
-		pnlDirtControls.setPreferredSize(new Dimension(520, 95));
-		pnlDirtControls.setBorder(compound);
-		pnlDirtOptions = new JPanel();
-		pnlDirtOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlDirtOptions2 = new JPanel();
-		pnlDirtOptions2.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlDirtOptions3 = new JPanel();
-		pnlDirtOptions3.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlDirtOptionsMiddle = new JPanel();
-		pnlDirtOptionsMiddle.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlDirtButton = new JPanel();
-		pnlDirtButton.setLayout(new FlowLayout(FlowLayout.CENTER));
-		
-		pnlBiomeControls = new JPanel();
-		pnlBiomeControls.setLayout(new BorderLayout());
-		pnlBiomeControls.setPreferredSize(new Dimension(520, 95));
-		pnlBiomeControls.setBorder(compound);
-		pnlBiomeOptions = new JPanel();
-		pnlBiomeOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlBiomeOptions2 = new JPanel();
-		pnlBiomeOptions2.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlBiomeOptions3 = new JPanel();
-		pnlBiomeOptions3.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlBiomeOptionsMiddle = new JPanel();
-		pnlBiomeOptionsMiddle.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlBiomeButton = new JPanel();
-		pnlBiomeButton.setLayout(new FlowLayout(FlowLayout.CENTER));
-		
-		pnlOreControls = new JPanel();
-		pnlOreControls.setLayout(new BorderLayout());
-		pnlOreControls.setPreferredSize(new Dimension(520, 130));
-		pnlOreControls.setBorder(compound);
-		pnlOreOptions = new JPanel();
-		pnlOreOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlOreOptions2 = new JPanel();
-		pnlOreOptions2.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlOreOptions3 = new JPanel();
-		pnlOreOptions3.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlOreOptions4 = new JPanel();
-		pnlOreOptions4.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlOreOptionsMiddle = new JPanel();
-		pnlOreOptionsMiddle.setLayout(new FlowLayout(FlowLayout.CENTER));
-		pnlOreButton = new JPanel();
-		pnlOreButton.setLayout(new FlowLayout(FlowLayout.CENTER));
-		
-		pnlSaveControls = new JPanel();
-		pnlSaveControls.setLayout(new BoxLayout(pnlSaveControls, BoxLayout.Y_AXIS));
-		pnlSaveOptions = new JPanel();
-		pnlSaveOptions.setLayout(new FlowLayout(FlowLayout.CENTER));
-		
-		lblMapSize = new JLabel("Map Size:");
+        this.setSize(width, height);
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setLayout(new BorderLayout());
+        
+        //Create panel map
+        pnlMap = new MapPanel(1, 1);
+        
+        //Configure HeightMap Elements
+        lblMapSize = new JLabel("Map Size:");
 		cmbMapSize = new JComboBox(new Integer[] {1024, 2048, 4096, 8192, 16384});
 		cmbMapSize.setSelectedIndex(1);
 		cmbMapSize.setEditable(false);
@@ -225,43 +174,83 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		btnResetHeightSeed = new JButton("#");
 		btnResetHeightSeed.addActionListener(this);
 		btnGenHeightMap = new JButton("Gen Heightmap");
-		btnLoadHeightMap = new JButton("Load Heightmap");
-		btnReloadHeightMap = new JButton("Reload Heightmap");
+		btnLoadHeightMap = new JButton("Load File...");
+		btnReloadHeightMap = new JButton("Reload");
 		btnGenHeightMap.addActionListener(this);
 		btnLoadHeightMap.addActionListener(this);
 		btnReloadHeightMap.addActionListener(this);
 		
-		pnlHeightMapOptions.add(lblMapSize);
-		pnlHeightMapOptions.add(cmbMapSize);
-		pnlHeightMapOptions.add(lblSeed);
-		pnlHeightMapOptions.add(txtSeed);
-		pnlHeightMapOptions.add(btnResetHeightSeed);
-		pnlHeightMapOptionsMiddleTop.add(lblRes);
-		pnlHeightMapOptionsMiddleTop.add(txtRes);
-		pnlHeightMapOptionsMiddleTop.add(lblIterations);
-		pnlHeightMapOptionsMiddleTop.add(txtIterations);
-		pnlHeightMapOptionsMiddleBottom.add(lblMinEdge);
-		pnlHeightMapOptionsMiddleBottom.add(txtMinEdge);
-		pnlHeightMapOptionsMiddleBottom.add(lblBorderWeight);
-		pnlHeightMapOptionsMiddleBottom.add(txtBorderWeight);
-		pnlHeightMapOptionsMiddleBottom.add(lblMaxHeight);
-		pnlHeightMapOptionsMiddleBottom.add(txtMaxHeight);
-		pnlHeightMapOptionsGenerate.add(chkLand);
-		pnlHeightMapOptionsGenerate.add(btnGenHeightMap);
-		pnlHeightMapOptionsLoadFile.add(btnLoadHeightMap);
-		pnlHeightMapOptionsLoadFile.add(btnReloadHeightMap);
+        
+        //Configure HeightMap Containers
+		ahiriSwing_PnlHeightMapOptions = new JPanel();
+		ahiriSwing_PnlHeightMapButtons = new JPanel();
+		ahiriSwing_PnlHeightMapOptions.setLayout(new BoxLayout(ahiriSwing_PnlHeightMapOptions, BoxLayout.PAGE_AXIS));
+		ahiriSwing_PnlHeightMapButtons.setLayout(new BoxLayout(ahiriSwing_PnlHeightMapButtons, BoxLayout.PAGE_AXIS));
 		
-		//pnlHeightMapOptionsMiddle.add(pnlHeightMapOptionsMiddleTop);
-		//pnlHeightMapOptionsMiddle.add(pnlHeightMapOptionsMiddleBottom);
+		ahiriSwing_PnlHeightMapButtons.setPreferredSize(new Dimension(300,60));
 		
-		pnlHeightMapControlsContainer.add(pnlHeightMapOptionsMiddleTop, BorderLayout.NORTH);
-		pnlHeightMapControlsContainer.add(pnlHeightMapOptionsMiddleBottom, BorderLayout.CENTER);
-		pnlHeightMapControlsContainer.add(pnlHeightMapOptionsGenerate, BorderLayout.SOUTH);
+		ahiriSwing_PnlHeightMap_MapSize = new JPanel();
+		ahiriSwing_PnlHeightMap_Seed = new JPanel();
+		ahiriSwing_PnlHeightMap_ResIter = new JPanel();
+		ahiriSwing_PnlHeightMap_EdgeBorder = new JPanel();
+		ahiriSwing_PnlHeightMap_HeightLand = new JPanel();
+		ahiriSwing_PnlHeightMap_Gen = new JPanel();
+		ahiriSwing_PnlHeightMap_Load = new JPanel();
 		
-		pnlHeightMapControls.add(pnlHeightMapOptions, BorderLayout.NORTH);
-		pnlHeightMapControls.add(pnlHeightMapControlsContainer,BorderLayout.CENTER);
-		pnlHeightMapControls.add(pnlHeightMapOptionsLoadFile,  BorderLayout.SOUTH);
+		ahiriSwing_PnlHeightMap_MapSize.setLayout(new FlowLayout());
+		ahiriSwing_PnlHeightMap_Seed.setLayout(new FlowLayout());
+		ahiriSwing_PnlHeightMap_ResIter.setLayout(new FlowLayout());
+		ahiriSwing_PnlHeightMap_EdgeBorder.setLayout(new FlowLayout());
+		ahiriSwing_PnlHeightMap_HeightLand.setLayout(new FlowLayout());
+		ahiriSwing_PnlHeightMap_Gen.setLayout(new FlowLayout());
+		ahiriSwing_PnlHeightMap_Load.setLayout(new FlowLayout());
 		
+		ahiriSwing_PnlHeightMap_MapSize.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlHeightMap_Seed.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlHeightMap_ResIter.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlHeightMap_EdgeBorder.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlHeightMap_HeightLand.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlHeightMap_Gen.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlHeightMap_Load.setPreferredSize(new Dimension(300,30));
+		
+		ahiriSwing_PnlHeightMap_MapSize.setMaximumSize(ahiriSwing_PnlHeightMap_MapSize.getPreferredSize());
+		ahiriSwing_PnlHeightMap_Seed.setMaximumSize(ahiriSwing_PnlHeightMap_Seed.getPreferredSize());
+		ahiriSwing_PnlHeightMap_ResIter.setMaximumSize(ahiriSwing_PnlHeightMap_ResIter.getPreferredSize());
+		ahiriSwing_PnlHeightMap_EdgeBorder.setMaximumSize(ahiriSwing_PnlHeightMap_EdgeBorder.getPreferredSize());
+		ahiriSwing_PnlHeightMap_HeightLand.setMaximumSize(ahiriSwing_PnlHeightMap_HeightLand.getPreferredSize());
+		ahiriSwing_PnlHeightMap_Gen.setMaximumSize(ahiriSwing_PnlHeightMap_EdgeBorder.getPreferredSize());
+		ahiriSwing_PnlHeightMap_Load.setMaximumSize(ahiriSwing_PnlHeightMap_HeightLand.getPreferredSize());
+
+		ahiriSwing_PnlHeightMap_MapSize.add(lblMapSize);
+		ahiriSwing_PnlHeightMap_MapSize.add(cmbMapSize);
+		ahiriSwing_PnlHeightMap_Seed.add(lblSeed);
+		ahiriSwing_PnlHeightMap_Seed.add(txtSeed);
+		ahiriSwing_PnlHeightMap_Seed.add(btnResetHeightSeed);
+		ahiriSwing_PnlHeightMap_ResIter.add(lblRes);
+		ahiriSwing_PnlHeightMap_ResIter.add(txtRes);
+		ahiriSwing_PnlHeightMap_ResIter.add(lblIterations);
+		ahiriSwing_PnlHeightMap_ResIter.add(txtIterations);
+		ahiriSwing_PnlHeightMap_EdgeBorder.add(lblMinEdge);
+		ahiriSwing_PnlHeightMap_EdgeBorder.add(txtMinEdge);
+		ahiriSwing_PnlHeightMap_EdgeBorder.add(lblBorderWeight);
+		ahiriSwing_PnlHeightMap_EdgeBorder.add(txtBorderWeight);
+		ahiriSwing_PnlHeightMap_HeightLand.add(lblMaxHeight);
+		ahiriSwing_PnlHeightMap_HeightLand.add(txtMaxHeight);
+		ahiriSwing_PnlHeightMap_HeightLand.add(chkLand);
+		ahiriSwing_PnlHeightMap_Gen.add(btnGenHeightMap);
+		ahiriSwing_PnlHeightMap_Load.add(btnLoadHeightMap);
+		ahiriSwing_PnlHeightMap_Load.add(btnReloadHeightMap);
+		
+		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_MapSize);
+		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_Seed);
+		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_ResIter);
+		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_EdgeBorder);
+		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_MapSize);
+		
+		ahiriSwing_PnlHeightMapButtons.add(ahiriSwing_PnlHeightMap_Gen);
+		ahiriSwing_PnlHeightMapButtons.add(ahiriSwing_PnlHeightMap_Load);
+		
+		//Configure Erosion Elements
 		lblErodeIterations = new JLabel("Erosion Iterations:");
 		txtErodeIterations = new JTextField("" + Constants.EROSION_ITERATIONS, 3);
 		lblErodeMinSlope = new JLabel("Erosion Min Slope:");
@@ -272,20 +261,50 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		btnErodeHeightMap = new JButton("Erode HeightMap");
 		btnErodeHeightMap.addActionListener(this);
 		
-		pnlErodeOptions.add(lblErodeIterations);
-		pnlErodeOptions.add(txtErodeIterations);
-		pnlErodeOptions.add(lblErodeMinSlope);
-		pnlErodeOptions.add(txtErodeMinSlope);
-		pnlErodeOptions2.add(lblErodeMaxSediment);
-		pnlErodeOptions2.add(txtErodeMaxSediment);
+		//Configure Erosion Containers
+		ahiriSwing_PnlErosionOptions = new JPanel();
+		ahiriSwing_PnlErosionButtons = new JPanel();
 		
-		pnlErodeButton.add(btnErodeHeightMap);
+		ahiriSwing_PnlErosionOptions.setLayout(new BoxLayout(ahiriSwing_PnlErosionOptions, BoxLayout.PAGE_AXIS));
+		ahiriSwing_PnlErosionButtons.setLayout(new BoxLayout(ahiriSwing_PnlErosionButtons, BoxLayout.PAGE_AXIS));
+
 		
-		pnlErodeControls.add(pnlErodeOptions, BorderLayout.NORTH);
-		pnlErodeControls.add(pnlErodeOptions2, BorderLayout.CENTER);
-		pnlErodeControls.add(pnlErodeButton, BorderLayout.SOUTH);
+		ahiriSwing_PnlErosion_Iter = new JPanel();
+		ahiriSwing_PnlErosion_Slope = new JPanel();
+		ahiriSwing_PnlErosion_Sediment = new JPanel();
+		ahiriSwing_PnlErosion_Erode = new JPanel();
 		
-		lblBiomeSeed = new JLabel("Biome Seed:");
+		ahiriSwing_PnlErosion_Iter.setLayout(new FlowLayout());
+		ahiriSwing_PnlErosion_Slope.setLayout(new FlowLayout());
+		ahiriSwing_PnlErosion_Sediment.setLayout(new FlowLayout());
+		ahiriSwing_PnlErosion_Erode.setLayout(new FlowLayout());
+		
+		ahiriSwing_PnlErosion_Iter.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlErosion_Slope.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlErosion_Sediment.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlErosion_Erode.setPreferredSize(new Dimension(300,30));
+		
+		ahiriSwing_PnlErosion_Iter.setMaximumSize(ahiriSwing_PnlErosion_Iter.getPreferredSize());
+		ahiriSwing_PnlErosion_Slope.setMaximumSize(ahiriSwing_PnlErosion_Slope.getPreferredSize());
+		ahiriSwing_PnlErosion_Sediment.setMaximumSize(ahiriSwing_PnlErosion_Sediment.getPreferredSize());
+		ahiriSwing_PnlErosion_Erode.setMaximumSize(ahiriSwing_PnlErosion_Erode.getPreferredSize());
+		
+		ahiriSwing_PnlErosion_Iter.add(lblErodeIterations);
+		ahiriSwing_PnlErosion_Iter.add(txtErodeIterations);
+		ahiriSwing_PnlErosion_Slope.add(lblErodeMinSlope);
+		ahiriSwing_PnlErosion_Slope.add(txtErodeMinSlope);
+		ahiriSwing_PnlErosion_Sediment.add(lblErodeMaxSediment);
+		ahiriSwing_PnlErosion_Sediment.add(txtErodeMaxSediment);
+		ahiriSwing_PnlErosion_Erode.add(btnErodeHeightMap);
+		
+		ahiriSwing_PnlErosionOptions.add(ahiriSwing_PnlErosion_Iter);
+		ahiriSwing_PnlErosionOptions.add(ahiriSwing_PnlErosion_Slope);
+		ahiriSwing_PnlErosionOptions.add(ahiriSwing_PnlErosion_Sediment);
+		
+		ahiriSwing_PnlErosionButtons.add(ahiriSwing_PnlErosion_Erode);
+		
+		//Configure Dirt Elements
+		lblBiomeSeed = new JLabel("Seed:");
 		txtBiomeSeed = new JTextField("" + System.currentTimeMillis(), 10);
 		lblDirtAmnt = new JLabel("Dirt Per Tile:");
 		txtDirtAmnt = new JTextField("" + Constants.DIRT_DROP_COUNT, 3);
@@ -305,30 +324,66 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		btnDropWater = new JButton("Reload Water");
 		btnDropWater.addActionListener(this);
 		
-		pnlDirtOptions.add(lblBiomeSeed);
-		pnlDirtOptions.add(txtBiomeSeed);
-		pnlDirtOptions.add(btnResetBiomeSeed);
-		pnlDirtOptions.add(lblDirtAmnt);
-		pnlDirtOptions.add(txtDirtAmnt);
-		pnlDirtOptions2.add(lblDirtSlope);
-		pnlDirtOptions2.add(txtDirtSlope);
-		pnlDirtOptions2.add(lblDirtDiagSlope);
-		pnlDirtOptions2.add(txtDirtDiagSlope);
-		pnlDirtOptions3.add(lblMaxDirtHeight);
-		pnlDirtOptions3.add(txtMaxDirtHeight);
-		pnlDirtOptions3.add(lblWaterHeight);
-		pnlDirtOptions3.add(txtWaterHeight);
+		//Configure Dirt Containers
+		ahiriSwing_PnlDirtOptions = new JPanel();
+		ahiriSwing_PnlDirtButtons = new JPanel();
 		
-		pnlDirtOptionsMiddle.add(pnlDirtOptions2);
-		pnlDirtOptionsMiddle.add(pnlDirtOptions3);
+		ahiriSwing_PnlDirtOptions.setLayout(new BoxLayout(ahiriSwing_PnlDirtOptions, BoxLayout.PAGE_AXIS));
+		ahiriSwing_PnlDirtButtons.setLayout(new BoxLayout(ahiriSwing_PnlDirtButtons, BoxLayout.PAGE_AXIS));
+
+		ahiriSwing_PnlDirt_Seed = new JPanel();
+		ahiriSwing_PnlDirt_Amnt = new JPanel();
+		ahiriSwing_PnlDirtSlope = new JPanel();
+		ahiriSwing_PnlDirt_DiagHeight = new JPanel();
+		ahiriSwing_PnlDirt_Water = new JPanel();
+		ahiriSwing_PnlDirt_Drop = new JPanel();
 		
-		pnlDirtButton.add(btnDropDirt);
-		pnlDirtButton.add(btnDropWater);
+		ahiriSwing_PnlDirt_Seed.setLayout(new FlowLayout());
+		ahiriSwing_PnlDirt_Amnt.setLayout(new FlowLayout());
+		ahiriSwing_PnlDirtSlope.setLayout(new FlowLayout());
+		ahiriSwing_PnlDirt_DiagHeight.setLayout(new FlowLayout());
+		ahiriSwing_PnlDirt_Water.setLayout(new FlowLayout());
+		ahiriSwing_PnlDirt_Drop.setLayout(new FlowLayout());
 		
-		pnlDirtControls.add(pnlDirtOptions, BorderLayout.NORTH);
-		pnlDirtControls.add(pnlDirtOptionsMiddle, BorderLayout.CENTER);
-		pnlDirtControls.add(pnlDirtButton, BorderLayout.SOUTH);
+		ahiriSwing_PnlDirt_Seed.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlDirt_Amnt.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlDirtSlope.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlDirt_DiagHeight.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlDirt_Water.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlDirt_Drop.setPreferredSize(new Dimension(300,30));
 		
+		ahiriSwing_PnlDirt_Seed.setMaximumSize(ahiriSwing_PnlDirt_Seed.getPreferredSize());
+		ahiriSwing_PnlDirt_Amnt.setMaximumSize(ahiriSwing_PnlDirt_Amnt.getPreferredSize());
+		ahiriSwing_PnlDirtSlope.setMaximumSize(ahiriSwing_PnlDirt_Amnt.getPreferredSize());
+		ahiriSwing_PnlDirt_DiagHeight.setMaximumSize(ahiriSwing_PnlDirt_DiagHeight.getPreferredSize());
+		ahiriSwing_PnlDirt_Water.setMaximumSize(ahiriSwing_PnlDirt_Water.getPreferredSize());
+		ahiriSwing_PnlDirt_Drop.setMaximumSize(ahiriSwing_PnlDirt_Drop.getPreferredSize());
+		
+		ahiriSwing_PnlDirt_Seed.add(lblBiomeSeed);
+		ahiriSwing_PnlDirt_Seed.add(txtBiomeSeed);
+		ahiriSwing_PnlDirt_Seed.add(btnResetBiomeSeed);
+		ahiriSwing_PnlDirt_Amnt.add(lblDirtAmnt);
+		ahiriSwing_PnlDirt_Amnt.add(txtDirtAmnt);
+		ahiriSwing_PnlDirtSlope.add(lblDirtSlope);
+		ahiriSwing_PnlDirtSlope.add(txtDirtSlope);
+		ahiriSwing_PnlDirt_DiagHeight.add(lblDirtDiagSlope);
+		ahiriSwing_PnlDirt_DiagHeight.add(txtDirtDiagSlope);
+		ahiriSwing_PnlDirt_DiagHeight.add(lblMaxDirtHeight);
+		ahiriSwing_PnlDirt_DiagHeight.add(txtMaxDirtHeight);
+		ahiriSwing_PnlDirt_Water.add(lblWaterHeight);
+		ahiriSwing_PnlDirt_Water.add(txtWaterHeight);
+		ahiriSwing_PnlDirt_Drop.add(btnDropDirt);
+		ahiriSwing_PnlDirt_Drop.add(btnDropWater);
+
+		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Seed);
+		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Amnt);
+		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirtSlope);
+		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_DiagHeight);
+		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Water);
+		
+		ahiriSwing_PnlDirtButtons.add(ahiriSwing_PnlDirt_Drop);
+		
+		//Configure Biome Elements
 		btnSeedBiome = new JButton("Add Biome");
 		btnSeedBiome.addActionListener(this);
 		btnUndoBiome = new JButton("Undo Last Biome");
@@ -352,7 +407,11 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		txtBiomeSize = new JTextField("" + Constants.BIOME_SIZE, 3);
 		lblBiomeMaxSlope = new JLabel("Max Slope:");
 		txtBiomeMaxSlope = new JTextField("" + Constants.BIOME_MAX_SLOPE, 3);
-		lblBiomeRate = new JLabel("Growth % N/S/E/W:");
+		lblBiomeRate = new JLabel("Growth %:");
+		lblBiomeRateN = new JLabel("N:");
+		lblBiomeRateS = new JLabel("S:");
+		lblBiomeRateE = new JLabel("E:");
+		lblBiomeRateW = new JLabel("W:");
 		txtBiomeRateN = new JTextField("" + Constants.BIOME_RATE / 2, 2);
 		txtBiomeRateS = new JTextField("" + (int) (Constants.BIOME_RATE * 1.3), 2);
 		txtBiomeRateE = new JTextField("" + (int) (Constants.BIOME_RATE * 0.6), 2);
@@ -362,34 +421,95 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		lblBiomeMaxHeight = new JLabel("Max Height:");
 		txtBiomeMaxHeight = new JTextField("" + Constants.BIOME_MAX_HEIGHT, 4);
 		
-		pnlBiomeOptions.add(cmbBiomeType);
-		pnlBiomeOptions.add(lblBiomeSeedCount);
-		pnlBiomeOptions.add(txtBiomeSeedCount);
-		pnlBiomeOptions.add(lblBiomeSize);
-		pnlBiomeOptions.add(txtBiomeSize);
-		pnlBiomeOptions2.add(lblBiomeMaxSlope);
-		pnlBiomeOptions2.add(txtBiomeMaxSlope);
-		pnlBiomeOptions3.add(lblBiomeRate);
-		pnlBiomeOptions3.add(txtBiomeRateN);
-		pnlBiomeOptions3.add(txtBiomeRateS);
-		pnlBiomeOptions3.add(txtBiomeRateE);
-		pnlBiomeOptions3.add(txtBiomeRateW);
-		pnlBiomeOptions2.add(lblBiomeMinHeight);
-		pnlBiomeOptions2.add(txtBiomeMinHeight);
-		pnlBiomeOptions2.add(lblBiomeMaxHeight);
-		pnlBiomeOptions2.add(txtBiomeMaxHeight);
+		//Configure Biome Containers
+		ahiriSwing_PnlBiomeOptions = new JPanel();
+		ahiriSwing_PnlBiomeButtons = new JPanel();
+				
+		ahiriSwing_PnlBiomeOptions.setLayout(new BoxLayout(ahiriSwing_PnlBiomeOptions, BoxLayout.PAGE_AXIS));
+		ahiriSwing_PnlBiomeButtons.setLayout(new BoxLayout(ahiriSwing_PnlBiomeButtons, BoxLayout.PAGE_AXIS));
 		
-		pnlBiomeOptionsMiddle.add(pnlBiomeOptions2);
-		pnlBiomeOptionsMiddle.add(pnlBiomeOptions3);
+		ahiriSwing_PnlBiome_Type = new JPanel();
+		ahiriSwing_PnlBiome_SeedSize = new JPanel();
+		ahiriSwing_PnlBiome_Slope = new JPanel();
+		ahiriSwing_PnlBiome_HeightMin = new JPanel();
+		ahiriSwing_PnlBiome_HeightMax = new JPanel();
+		ahiriSwing_PnlBiome_Rate = new JPanel();
+		ahiriSwing_PnlBiome_RateNS = new JPanel();
+		ahiriSwing_PnlBiome_RateEW = new JPanel();
+		ahiriSwing_PnlBiome_Add = new JPanel();
+		ahiriSwing_PnlBiome_ResetUndo = new JPanel();
 		
-		pnlBiomeButton.add(btnSeedBiome);
-		pnlBiomeButton.add(btnUndoBiome);
-		pnlBiomeButton.add(btnResetBiomes);
+		ahiriSwing_PnlBiome_Type.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_SeedSize.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_Slope.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_HeightMin.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_HeightMax.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_Rate.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_RateNS.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_RateEW.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_Add.setLayout(new FlowLayout());
+		ahiriSwing_PnlBiome_ResetUndo.setLayout(new FlowLayout());
 		
-		pnlBiomeControls.add(pnlBiomeOptions, BorderLayout.NORTH);
-		pnlBiomeControls.add(pnlBiomeOptionsMiddle, BorderLayout.CENTER);
-		pnlBiomeControls.add(pnlBiomeButton, BorderLayout.SOUTH);
+		ahiriSwing_PnlBiome_Type.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_SeedSize.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_Slope.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_HeightMin.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_HeightMax.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_Rate.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_RateNS.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_RateEW.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_Add.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlBiome_ResetUndo.setPreferredSize(new Dimension(300,30));
 		
+		ahiriSwing_PnlBiome_Type.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		ahiriSwing_PnlBiome_SeedSize.setMaximumSize(ahiriSwing_PnlBiome_SeedSize.getPreferredSize());
+		ahiriSwing_PnlBiome_Slope.setMaximumSize(ahiriSwing_PnlBiome_Slope.getPreferredSize());
+		ahiriSwing_PnlBiome_HeightMin.setMaximumSize(ahiriSwing_PnlBiome_HeightMin.getPreferredSize());
+		ahiriSwing_PnlBiome_HeightMax.setMaximumSize(ahiriSwing_PnlBiome_HeightMax.getPreferredSize());
+		ahiriSwing_PnlBiome_Rate.setMaximumSize(ahiriSwing_PnlBiome_Rate.getPreferredSize());
+		ahiriSwing_PnlBiome_RateNS.setMaximumSize(ahiriSwing_PnlBiome_RateNS.getPreferredSize());
+		ahiriSwing_PnlBiome_RateEW.setMaximumSize(ahiriSwing_PnlBiome_RateEW.getPreferredSize());
+		ahiriSwing_PnlBiome_Add.setMaximumSize(ahiriSwing_PnlBiome_Add.getPreferredSize());
+		ahiriSwing_PnlBiome_ResetUndo.setMaximumSize(ahiriSwing_PnlBiome_ResetUndo.getPreferredSize());
+		
+
+		ahiriSwing_PnlBiome_Type.add(cmbBiomeType);
+		ahiriSwing_PnlBiome_SeedSize.add(lblBiomeSeedCount);
+		ahiriSwing_PnlBiome_SeedSize.add(txtBiomeSeedCount);
+		ahiriSwing_PnlBiome_SeedSize.add(lblBiomeSize);
+		ahiriSwing_PnlBiome_SeedSize.add(txtBiomeSize);
+		ahiriSwing_PnlBiome_Slope.add(lblBiomeMaxSlope);
+		ahiriSwing_PnlBiome_Slope.add(txtBiomeMaxSlope);
+		ahiriSwing_PnlBiome_HeightMin.add(lblBiomeMinHeight);
+		ahiriSwing_PnlBiome_HeightMin.add(txtBiomeMinHeight);
+		ahiriSwing_PnlBiome_HeightMax.add(lblBiomeMaxHeight);
+		ahiriSwing_PnlBiome_HeightMax.add(txtBiomeMaxHeight);
+		ahiriSwing_PnlBiome_Rate.add(lblBiomeRate);
+		ahiriSwing_PnlBiome_RateNS.add(lblBiomeRateN);
+		ahiriSwing_PnlBiome_RateNS.add(txtBiomeRateN);
+		ahiriSwing_PnlBiome_RateNS.add(lblBiomeRateS);
+		ahiriSwing_PnlBiome_RateNS.add(txtBiomeRateS);
+		ahiriSwing_PnlBiome_RateEW.add(lblBiomeRateE);
+		ahiriSwing_PnlBiome_RateEW.add(txtBiomeRateE);
+		ahiriSwing_PnlBiome_RateEW.add(lblBiomeRateW);
+		ahiriSwing_PnlBiome_RateEW.add(txtBiomeRateW);
+		ahiriSwing_PnlBiome_Add.add(btnSeedBiome);
+		ahiriSwing_PnlBiome_ResetUndo.add(btnUndoBiome);
+		ahiriSwing_PnlBiome_ResetUndo.add(btnResetBiomes);
+		
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_Type);
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_SeedSize);
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_Slope);
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_HeightMin);
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_HeightMax);
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_Rate);
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_RateNS);
+		ahiriSwing_PnlBiomeOptions.add(ahiriSwing_PnlBiome_RateEW);
+		
+		ahiriSwing_PnlBiomeButtons.add(ahiriSwing_PnlBiome_Add);
+		ahiriSwing_PnlBiomeButtons.add(ahiriSwing_PnlBiome_ResetUndo);
+		
+		//Configure Ore Elements
 		btnGenOres = new JButton("Generate Ores");
 		btnGenOres.addActionListener(this);
 		
@@ -431,42 +551,112 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		txtRock = new JTextField("" + Constants.ORE_ROCK, 3);
 		txtRock.setEditable(false);
 		
-		pnlOreOptions.add(lblIron);
-		pnlOreOptions.add(txtIron);
-		pnlOreOptions.add(lblGold);
-		pnlOreOptions.add(txtGold);
-		pnlOreOptions.add(lblSilver);
-		pnlOreOptions.add(txtSilver);
-		pnlOreOptions2.add(lblZinc);
-		pnlOreOptions2.add(txtZinc);
-		pnlOreOptions2.add(lblCopper);
-		pnlOreOptions2.add(txtCopper);
-		pnlOreOptions2.add(lblLead);
-		pnlOreOptions2.add(txtLead);
-		pnlOreOptions3.add(lblTin);
-		pnlOreOptions3.add(txtTin);
-		pnlOreOptions4.add(lblAddy);
-		pnlOreOptions4.add(txtAddy);
-		pnlOreOptions4.add(lblGlimmer);
-		pnlOreOptions4.add(txtGlimmer);
-		pnlOreOptions3.add(lblMarble);
-		pnlOreOptions3.add(txtMarble);
-		pnlOreOptions3.add(lblSlate);
-		pnlOreOptions3.add(txtSlate);
-		pnlOreOptions4.add(lblRock);
-		pnlOreOptions4.add(txtRock);
+		//Configure Ore Containers
+		ahiriSwing_PnlOreOptions = new JPanel();
+		ahiriSwing_PnlOreButtons = new JPanel();
 		
-		pnlOreOptionsMiddle.add(pnlOreOptions2);
-		pnlOreOptionsMiddle.add(pnlOreOptions3);
-		pnlOreOptionsMiddle.add(pnlOreOptions4);
+		ahiriSwing_PnlOreOptions.setLayout(new BoxLayout(ahiriSwing_PnlOreOptions, BoxLayout.PAGE_AXIS));
+		ahiriSwing_PnlOreButtons.setLayout(new BoxLayout(ahiriSwing_PnlOreButtons, BoxLayout.PAGE_AXIS));
 		
-		pnlOreButton.add(btnGenOres);
+		ahiriSwing_PnlOre_RockIron = new JPanel();
+		ahiriSwing_PnlOre_GoldSilver = new JPanel();
+		ahiriSwing_PnlOre_ZincCopper = new JPanel();
+		ahiriSwing_PnlOre_LeadTin = new JPanel();
+		ahiriSwing_PnlOre_AddyGlimmer = new JPanel();
+		ahiriSwing_PnlOre_MarbleSlate = new JPanel();
+		ahiriSwing_PnlOre_Gen = new JPanel();
 		
-		pnlOreControls.add(pnlOreOptions, BorderLayout.NORTH);
-		pnlOreControls.add(pnlOreOptionsMiddle, BorderLayout.CENTER);
-		pnlOreControls.add(pnlOreButton, BorderLayout.SOUTH);
+		ahiriSwing_PnlOre_RockIron.setLayout(new FlowLayout());
+		ahiriSwing_PnlOre_GoldSilver.setLayout(new FlowLayout());
+		ahiriSwing_PnlOre_ZincCopper.setLayout(new FlowLayout());
+		ahiriSwing_PnlOre_LeadTin.setLayout(new FlowLayout());
+		ahiriSwing_PnlOre_AddyGlimmer.setLayout(new FlowLayout());
+		ahiriSwing_PnlOre_MarbleSlate.setLayout(new FlowLayout());
+		ahiriSwing_PnlOre_Gen.setLayout(new FlowLayout());
 		
-		txtName = new JTextField(txtSeed.getText(), 10);
+		ahiriSwing_PnlOre_RockIron.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlOre_GoldSilver.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlOre_ZincCopper.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlOre_LeadTin.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlOre_AddyGlimmer.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlOre_MarbleSlate.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlOre_Gen.setPreferredSize(new Dimension(300,30));
+		
+		ahiriSwing_PnlOre_RockIron.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		ahiriSwing_PnlOre_GoldSilver.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		ahiriSwing_PnlOre_ZincCopper.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		ahiriSwing_PnlOre_LeadTin.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		ahiriSwing_PnlOre_AddyGlimmer.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		ahiriSwing_PnlOre_MarbleSlate.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		ahiriSwing_PnlOre_Gen.setMaximumSize(ahiriSwing_PnlBiome_Type.getPreferredSize());
+		
+		ahiriSwing_PnlOre_RockIron.add(lblIron);
+		ahiriSwing_PnlOre_RockIron.add(txtIron);
+		ahiriSwing_PnlOre_GoldSilver.add(lblGold);
+		ahiriSwing_PnlOre_GoldSilver.add(txtGold);
+		ahiriSwing_PnlOre_GoldSilver.add(lblSilver);
+		ahiriSwing_PnlOre_GoldSilver.add(txtSilver);
+		ahiriSwing_PnlOre_ZincCopper.add(lblZinc);
+		ahiriSwing_PnlOre_ZincCopper.add(txtZinc);
+		ahiriSwing_PnlOre_ZincCopper.add(lblCopper);
+		ahiriSwing_PnlOre_ZincCopper.add(txtCopper);
+		ahiriSwing_PnlOre_LeadTin.add(lblLead);
+		ahiriSwing_PnlOre_LeadTin.add(txtLead);
+		ahiriSwing_PnlOre_LeadTin.add(lblTin);
+		ahiriSwing_PnlOre_LeadTin.add(txtTin);
+		ahiriSwing_PnlOre_AddyGlimmer.add(lblAddy);
+		ahiriSwing_PnlOre_AddyGlimmer.add(txtAddy);
+		ahiriSwing_PnlOre_AddyGlimmer.add(lblGlimmer);
+		ahiriSwing_PnlOre_AddyGlimmer.add(txtGlimmer);
+		ahiriSwing_PnlOre_MarbleSlate.add(lblMarble);
+		ahiriSwing_PnlOre_MarbleSlate.add(txtMarble);
+		ahiriSwing_PnlOre_MarbleSlate.add(lblSlate);
+		ahiriSwing_PnlOre_MarbleSlate.add(txtSlate);
+		ahiriSwing_PnlOre_RockIron.add(lblRock);
+		ahiriSwing_PnlOre_RockIron.add(txtRock);
+		ahiriSwing_PnlOre_Gen.add(btnGenOres);
+		
+		ahiriSwing_PnlOreOptions.add(ahiriSwing_PnlOre_RockIron);
+		ahiriSwing_PnlOreOptions.add(ahiriSwing_PnlOre_GoldSilver);
+		ahiriSwing_PnlOreOptions.add(ahiriSwing_PnlOre_ZincCopper);
+		ahiriSwing_PnlOreOptions.add(ahiriSwing_PnlOre_LeadTin);
+		ahiriSwing_PnlOreOptions.add(ahiriSwing_PnlOre_AddyGlimmer);
+		ahiriSwing_PnlOreOptions.add(ahiriSwing_PnlOre_MarbleSlate);
+		
+		ahiriSwing_PnlOreButtons.add(ahiriSwing_PnlOre_Gen);
+		
+        //Configure Console Element
+		ahiriSwing_Console = new JTextArea(50,41);
+		ahiriSwing_ConsoleScrollPane = new JScrollPane(ahiriSwing_Console); 
+		ahiriSwing_Console.setEditable(false);
+		ahiriSwing_Console.setLineWrap(true);
+		ahiriSwing_Console.setWrapStyleWord(true);
+		ahiriSwing_Console.setText("Someday I'm going to be a console that shows logger messages\n\nBut that day is not today\n\nMy programmer needs to go to bed, it's 3AM in the morning.");
+		
+        //Configure Console Panel
+        ahiriSwing_PnlConsole = new JPanel();
+        ahiriSwing_PnlConsole.setPreferredSize(new Dimension(500, 100));
+        ahiriSwing_PnlConsole.add(ahiriSwing_ConsoleScrollPane);
+        
+        //Configure Progress Bar for Status Panel
+        ahiriSwing_ProgressBarStatus = new JProgressBar(0, 100);
+        ahiriSwing_ProgressBarStatus.setValue(0);
+                
+        //Configure Status Panel
+        ahiriSwing_PnlStatus = new JPanel();
+        ahiriSwing_PnlStatus.setPreferredSize(new Dimension(500, 30));
+        ahiriSwing_ProgressBarStatus.setPreferredSize(ahiriSwing_PnlStatus.getPreferredSize());
+        ahiriSwing_PnlStatus.add(ahiriSwing_ProgressBarStatus);
+        
+        //Configure Console and Status Panel Container
+    	ahiriSwing_PnlConsoleAndStatus = new JPanel();
+    	ahiriSwing_PnlConsoleAndStatus.setPreferredSize(new Dimension(500, 150));
+    	ahiriSwing_PnlConsoleAndStatus.setLayout(new BorderLayout());
+    	ahiriSwing_PnlConsoleAndStatus.add(ahiriSwing_PnlConsole, BorderLayout.CENTER);
+    	ahiriSwing_PnlConsoleAndStatus.add(ahiriSwing_PnlStatus, BorderLayout.PAGE_END);
+    	
+    	//Configure Map Controls Elements
+    	txtName = new JTextField(txtSeed.getText(), 10);
 		txtName.addFocusListener(this);
 		btnSaveActions = new JButton("Save Actions");
 		btnSaveActions.addActionListener(this);
@@ -485,43 +675,90 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		btnShowHeightMap = new JButton("Show Height View");
 		btnShowHeightMap.addActionListener(this);
 		
-		pnlSaveOptions.add(txtName);
-		pnlSaveOptions.add(btnSaveActions);
-		pnlSaveOptions.add(btnLoadActions);
-		pnlSaveOptions.add(btnSaveImages);
-		pnlSaveOptions.add(btnSaveMap);
-		pnlSaveOptions.add(btnShowDump);
-		pnlSaveOptions.add(btnShowTopo);
-		pnlSaveOptions.add(btnShowCave);
-		pnlSaveOptions.add(btnShowHeightMap);
+    	//Configure Map Controls Panel Container
+		ahiriSwing_PnlMapControls = new JPanel();
+		ahiriSwing_PnlMapControls.add(txtName);
+		ahiriSwing_PnlMapControls.add(btnSaveActions);
+		ahiriSwing_PnlMapControls.add(btnLoadActions);
+		ahiriSwing_PnlMapControls.add(btnSaveImages);
+		ahiriSwing_PnlMapControls.add(btnSaveMap);
+		ahiriSwing_PnlMapControls.add(btnShowDump);
+		ahiriSwing_PnlMapControls.add(btnShowTopo);
+		ahiriSwing_PnlMapControls.add(btnShowCave);
+		ahiriSwing_PnlMapControls.add(btnShowHeightMap);
+		ahiriSwing_PnlMapControls.setPreferredSize(new Dimension(500, 65));
 		
-		pnlSaveControls.add(pnlSaveOptions, BorderLayout.CENTER);
-		pnlSaveControls.setPreferredSize(new Dimension(1000, 35));
-		
-		//pnlControls.add(pnlHeightMapControls);
-		//pnlControls.add(pnlErodeControls);
-		//pnlControls.add(pnlDirtControls);
-		//pnlControls.add(pnlBiomeControls);
-		//pnlControls.add(pnlOreControls);
-		
-		ImageIcon icon = null;
-		tabControls.addTab("Heightmap", icon, pnlHeightMapControls, "Heightmap Controls");
-		tabControls.addTab("Erosion", icon, pnlErodeControls, "Erode Controls");
-		tabControls.addTab("Dirt", icon, pnlDirtControls, "Dirt Controls");
-		tabControls.addTab("Biome", icon, pnlBiomeControls, "Biome Controls");
-		tabControls.addTab("Ore", icon, pnlOreControls, "Ore Controls");
-		
-		pnlMap = new MapPanel(width, height);
-		pnlMap.setBackground(Color.BLACK);
-		
-		//this.add(pnlControls, BorderLayout.EAST);
-		this.add(tabControls, BorderLayout.EAST);
-		this.add(pnlMap, BorderLayout.CENTER);
-		this.add(pnlSaveControls, BorderLayout.SOUTH);
-		
-		this.setBounds(0, 0, width + 400, height + 35);
-		this.setLocationRelativeTo(null);
-		this.setVisible(true);
+    	//Configure Map and Controls Panel Container
+    	ahiriSwing_PnlMapAndControls = new JPanel();
+    	ahiriSwing_PnlMapAndControls.setLayout(new BorderLayout());
+    	ahiriSwing_PnlMapAndControls.add(pnlMap, BorderLayout.CENTER);
+    	ahiriSwing_PnlMapAndControls.add(ahiriSwing_PnlMapControls, BorderLayout.PAGE_END);
+    	
+    	//Configure Map and Status Panel Container
+    	ahiriSwing_PnlMapAndStatus = new JPanel();
+    	ahiriSwing_PnlMapAndStatus.setLayout(new BorderLayout());
+    	ahiriSwing_PnlMapAndStatus.add(ahiriSwing_PnlMapAndControls, BorderLayout.CENTER);
+    	ahiriSwing_PnlMapAndStatus.add(ahiriSwing_PnlConsoleAndStatus, BorderLayout.PAGE_END);
+    	
+        //Configure Tabs
+    	//HeightMap Tab
+    	ahiriSwing_PnlHeightMapControls = new JPanel();
+    	ahiriSwing_PnlHeightMapControls.setLayout(new BorderLayout());
+    	ahiriSwing_PnlHeightMapControls.add(ahiriSwing_PnlHeightMapOptions, BorderLayout.CENTER);
+    	ahiriSwing_PnlHeightMapControls.add(ahiriSwing_PnlHeightMapButtons, BorderLayout.PAGE_END);
+    	//Erosion Tab
+    	ahiriSwing_PnlErosionControls = new JPanel();
+    	ahiriSwing_PnlErosionControls.setLayout(new BorderLayout());
+    	ahiriSwing_PnlErosionControls.add(ahiriSwing_PnlErosionOptions, BorderLayout.CENTER);
+    	ahiriSwing_PnlErosionControls.add(ahiriSwing_PnlErosionButtons, BorderLayout.PAGE_END);
+    	//Dirt Tab
+    	ahiriSwing_PnlDirtControls = new JPanel();
+    	ahiriSwing_PnlDirtControls.setLayout(new BorderLayout());
+    	ahiriSwing_PnlDirtControls.add(ahiriSwing_PnlDirtOptions, BorderLayout.CENTER);
+    	ahiriSwing_PnlDirtControls.add(ahiriSwing_PnlDirtButtons, BorderLayout.PAGE_END);
+    	//Biome Tab
+    	ahiriSwing_PnlBiomeControls = new JPanel();
+    	ahiriSwing_PnlBiomeControls.setLayout(new BorderLayout());
+    	ahiriSwing_PnlBiomeControls.add(ahiriSwing_PnlBiomeOptions, BorderLayout.CENTER);
+    	ahiriSwing_PnlBiomeControls.add(ahiriSwing_PnlBiomeButtons, BorderLayout.PAGE_END);
+    	//Ore Tab
+    	ahiriSwing_PnlOreControls = new JPanel();
+    	ahiriSwing_PnlOreControls.setLayout(new BorderLayout());
+    	ahiriSwing_PnlOreControls.add(ahiriSwing_PnlOreOptions, BorderLayout.CENTER);
+    	ahiriSwing_PnlOreControls.add(ahiriSwing_PnlOreButtons, BorderLayout.PAGE_END);
+        
+        //Creates Icons for the tab panel
+        ImageIcon ahiriSwing_IconHeightMap = createImageIcon("/icon-heightmap.png","Heightmap");
+        ImageIcon ahiriSwing_IconErosion = createImageIcon("/icon-erosion.png","Erosion");
+        ImageIcon ahiriSwing_IconDirt = createImageIcon("/icon-dirt.png","Dirt");
+        ImageIcon ahiriSwing_IconBiome = createImageIcon("/icon-biome.png","Biome");
+        ImageIcon ahiriSwing_IconOre = createImageIcon("/icon-ore.png","Ore");
+        
+        //Configure tab panel
+        ahiriSwing_TabControls = new JTabbedPane();
+        ahiriSwing_TabControls.setPreferredSize(new Dimension(300, 600));
+        
+        //Adds tabs to tab panel
+        ahiriSwing_TabControls.addTab("Heightmap", ahiriSwing_IconHeightMap, ahiriSwing_PnlHeightMapControls, "Heightmap Controls");
+        ahiriSwing_TabControls.addTab("Erosion", ahiriSwing_IconErosion, ahiriSwing_PnlErosionControls, "Erode Controls");
+        ahiriSwing_TabControls.addTab("Dirt", ahiriSwing_IconDirt, ahiriSwing_PnlDirtControls, "Dirt Controls");
+        ahiriSwing_TabControls.addTab("Biome", ahiriSwing_IconBiome, ahiriSwing_PnlBiomeControls, "Biome Controls");
+        ahiriSwing_TabControls.addTab("Ore", ahiriSwing_IconOre, ahiriSwing_PnlOreControls, "Ore Controls");
+        
+        //Adds the top level panels
+        this.add(ahiriSwing_PnlMapAndStatus, BorderLayout.CENTER);
+        this.add(ahiriSwing_TabControls, BorderLayout.LINE_END);
+        this.setVisible(true);
+	}
+	
+	/** Returns an ImageIcon, or null if the path was invalid. */
+	protected ImageIcon createImageIcon(String path, String description) {
+		java.net.URL imgURL = getClass().getResource(path);
+		if (imgURL != null) {
+			return new ImageIcon(imgURL, description);
+		} else {
+			return null;
+		}
 	}
 	
 	public WurmAPI getAPI() {
@@ -1074,7 +1311,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 	}
 	
 	public static void main(String[] args) {
-		new WGenerator(Constants.WINDOW_TITLE, Constants.WINDOW_SIZE, Constants.WINDOW_SIZE);
+		new WGenerator(Constants.WINDOW_TITLE, Constants.WINDOW_SIZE_WIDTH, Constants.WINDOW_SIZE_HEIGHT);
 	}
 
 	@Override
