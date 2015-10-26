@@ -91,7 +91,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 					private JPanel ahiriSwing_PnlHeightMap_Gen, ahiriSwing_PnlHeightMap_Load;
 					private JPanel ahiriSwing_PnlErosion_Iter, ahiriSwing_PnlErosion_Slope, ahiriSwing_PnlErosion_Sediment;
 					private JPanel ahiriSwing_PnlErosion_Erode;
-					private JPanel ahiriSwing_PnlDirt_Seed, ahiriSwing_PnlDirt_Amnt, ahiriSwing_PnlDirtSlope, ahiriSwing_PnlDirt_DiagHeight, ahiriSwing_PnlDirt_Water;
+					private JPanel ahiriSwing_PnlDirt_Seed, ahiriSwing_PnlDirt_Amnt, ahiriSwing_PnlDirtSlope, ahiriSwing_PnlDirt_Diag, ahiriSwing_PnlDirt_Height, ahiriSwing_PnlDirt_Water;
 					private JPanel ahiriSwing_PnlDirt_Drop;
 					private JPanel ahiriSwing_PnlBiome_Type, ahiriSwing_PnlBiome_SeedSize, ahiriSwing_PnlBiome_Slope, ahiriSwing_PnlBiome_HeightMin, ahiriSwing_PnlBiome_HeightMax, ahiriSwing_PnlBiome_Rate, ahiriSwing_PnlBiome_RateNS, ahiriSwing_PnlBiome_RateEW;
 					private JPanel ahiriSwing_PnlBiome_Add, ahiriSwing_PnlBiome_ResetUndo;
@@ -245,7 +245,7 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_Seed);
 		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_ResIter);
 		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_EdgeBorder);
-		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_MapSize);
+		ahiriSwing_PnlHeightMapOptions.add(ahiriSwing_PnlHeightMap_HeightLand);
 		
 		ahiriSwing_PnlHeightMapButtons.add(ahiriSwing_PnlHeightMap_Gen);
 		ahiriSwing_PnlHeightMapButtons.add(ahiriSwing_PnlHeightMap_Load);
@@ -334,28 +334,32 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		ahiriSwing_PnlDirt_Seed = new JPanel();
 		ahiriSwing_PnlDirt_Amnt = new JPanel();
 		ahiriSwing_PnlDirtSlope = new JPanel();
-		ahiriSwing_PnlDirt_DiagHeight = new JPanel();
+		ahiriSwing_PnlDirt_Diag = new JPanel();
+		ahiriSwing_PnlDirt_Height = new JPanel();
 		ahiriSwing_PnlDirt_Water = new JPanel();
 		ahiriSwing_PnlDirt_Drop = new JPanel();
 		
 		ahiriSwing_PnlDirt_Seed.setLayout(new FlowLayout());
 		ahiriSwing_PnlDirt_Amnt.setLayout(new FlowLayout());
 		ahiriSwing_PnlDirtSlope.setLayout(new FlowLayout());
-		ahiriSwing_PnlDirt_DiagHeight.setLayout(new FlowLayout());
+		ahiriSwing_PnlDirt_Diag.setLayout(new FlowLayout());
+		ahiriSwing_PnlDirt_Height.setLayout(new FlowLayout());
 		ahiriSwing_PnlDirt_Water.setLayout(new FlowLayout());
 		ahiriSwing_PnlDirt_Drop.setLayout(new FlowLayout());
 		
 		ahiriSwing_PnlDirt_Seed.setPreferredSize(new Dimension(300,30));
 		ahiriSwing_PnlDirt_Amnt.setPreferredSize(new Dimension(300,30));
 		ahiriSwing_PnlDirtSlope.setPreferredSize(new Dimension(300,30));
-		ahiriSwing_PnlDirt_DiagHeight.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlDirt_Diag.setPreferredSize(new Dimension(300,30));
+		ahiriSwing_PnlDirt_Height.setPreferredSize(new Dimension(300,30));
 		ahiriSwing_PnlDirt_Water.setPreferredSize(new Dimension(300,30));
 		ahiriSwing_PnlDirt_Drop.setPreferredSize(new Dimension(300,30));
 		
 		ahiriSwing_PnlDirt_Seed.setMaximumSize(ahiriSwing_PnlDirt_Seed.getPreferredSize());
 		ahiriSwing_PnlDirt_Amnt.setMaximumSize(ahiriSwing_PnlDirt_Amnt.getPreferredSize());
-		ahiriSwing_PnlDirtSlope.setMaximumSize(ahiriSwing_PnlDirt_Amnt.getPreferredSize());
-		ahiriSwing_PnlDirt_DiagHeight.setMaximumSize(ahiriSwing_PnlDirt_DiagHeight.getPreferredSize());
+		ahiriSwing_PnlDirtSlope.setMaximumSize(ahiriSwing_PnlDirtSlope.getPreferredSize());
+		ahiriSwing_PnlDirt_Diag.setMaximumSize(ahiriSwing_PnlDirt_Diag.getPreferredSize());
+		ahiriSwing_PnlDirt_Height.setMaximumSize(ahiriSwing_PnlDirt_Height.getPreferredSize());
 		ahiriSwing_PnlDirt_Water.setMaximumSize(ahiriSwing_PnlDirt_Water.getPreferredSize());
 		ahiriSwing_PnlDirt_Drop.setMaximumSize(ahiriSwing_PnlDirt_Drop.getPreferredSize());
 		
@@ -366,10 +370,10 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		ahiriSwing_PnlDirt_Amnt.add(txtDirtAmnt);
 		ahiriSwing_PnlDirtSlope.add(lblDirtSlope);
 		ahiriSwing_PnlDirtSlope.add(txtDirtSlope);
-		ahiriSwing_PnlDirt_DiagHeight.add(lblDirtDiagSlope);
-		ahiriSwing_PnlDirt_DiagHeight.add(txtDirtDiagSlope);
-		ahiriSwing_PnlDirt_DiagHeight.add(lblMaxDirtHeight);
-		ahiriSwing_PnlDirt_DiagHeight.add(txtMaxDirtHeight);
+		ahiriSwing_PnlDirt_Diag.add(lblDirtDiagSlope);
+		ahiriSwing_PnlDirt_Diag.add(txtDirtDiagSlope);
+		ahiriSwing_PnlDirt_Height.add(lblMaxDirtHeight);
+		ahiriSwing_PnlDirt_Height.add(txtMaxDirtHeight);
 		ahiriSwing_PnlDirt_Water.add(lblWaterHeight);
 		ahiriSwing_PnlDirt_Water.add(txtWaterHeight);
 		ahiriSwing_PnlDirt_Drop.add(btnDropDirt);
@@ -378,7 +382,8 @@ public class WGenerator extends JFrame implements ActionListener, FocusListener 
 		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Seed);
 		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Amnt);
 		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirtSlope);
-		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_DiagHeight);
+		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Diag);
+		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Height);
 		ahiriSwing_PnlDirtOptions.add(ahiriSwing_PnlDirt_Water);
 		
 		ahiriSwing_PnlDirtButtons.add(ahiriSwing_PnlDirt_Drop);
